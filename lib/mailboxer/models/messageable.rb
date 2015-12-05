@@ -75,10 +75,13 @@ module Mailboxer
           :recipients   => recipients,
           :body         => msg_body,
           :subject      => subject,
-          :attachment   => attachment,
           :created_at   => message_timestamp,
           :updated_at   => message_timestamp
         }).build
+         
+        if attachment
+          attach(message, attachment)
+        end
 
         message.deliver false, sanitize_text
       end
@@ -93,8 +96,11 @@ module Mailboxer
           :recipients   => recipients,
           :body         => reply_body,
           :subject      => subject,
-          :attachment   => attachment
         }).build
+
+        if attachment
+          attach(message, attachment)
+        end
 
         response.recipients.delete(self)
         response.deliver true, sanitize_text
@@ -120,6 +126,12 @@ module Mailboxer
         end
 
         reply(conversation, conversation.last_message.recipients, reply_body, subject, sanitize_text, attachment)
+      end
+
+      def attach(message, attachment)
+        attachment.each do |m|
+          message.message_attachments << MessageAttachment.new(attachment: m)
+        end
       end
 
       #Mark the object as read for messageable.
