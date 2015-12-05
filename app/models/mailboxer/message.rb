@@ -1,8 +1,9 @@
 class Mailboxer::Message < Mailboxer::Notification
-  attr_accessible :attachment if Mailboxer.protected_attributes?
+  attr_accessible :message_attachments if Mailboxer.protected_attributes?
   self.table_name = :mailboxer_notifications
 
   belongs_to :conversation, :class_name => "Mailboxer::Conversation", :validate => true, :autosave => true
+  has_many :message_attachments, :class_name => "Mailboxer::MessageAttachment"
   validates_presence_of :sender
 
   class_attribute :on_deliver_callback
@@ -10,8 +11,6 @@ class Mailboxer::Message < Mailboxer::Notification
   scope :conversation, lambda { |conversation|
     where(:conversation_id => conversation.id)
   }
-
-  mount_uploader :attachment, AttachmentUploader
 
   class << self
     #Sets the on deliver callback method.
