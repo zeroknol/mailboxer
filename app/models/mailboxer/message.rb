@@ -1,5 +1,4 @@
 class Mailboxer::Message < Mailboxer::Notification
-  accepts_nested_attributes_for :message_attachments
   self.table_name = :mailboxer_notifications
 
   belongs_to :conversation, :class_name => "Mailboxer::Conversation", :validate => true, :autosave => true
