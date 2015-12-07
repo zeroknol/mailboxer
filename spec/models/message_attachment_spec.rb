@@ -13,7 +13,7 @@ describe Mailboxer::MessageAttachment do
     assert @mail1.message.message_attachments
   end
 
-  it "should return two messages" do
+  it "should return two message attachments" do
     assert @mail1.message.message_attachments.count, 2
   end
 
