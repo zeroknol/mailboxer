@@ -27,4 +27,8 @@ describe Mailboxer::Message do
     expect(@message1.is_deleted?(@entity1)).to be true
   end
 
+  it "should return an empty array of message attachments" do
+    expect(@message1.message_attachments).to eq []
+  end
+
 end
