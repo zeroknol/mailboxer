@@ -1,5 +1,7 @@
 # Mailboxer [![Build Status](https://travis-ci.org/mailboxer/mailboxer.svg?branch=master)](https://travis-ci.org/mailboxer/mailboxer) [![Gem Version](https://badge.fury.io/rb/mailboxer.png)](http://badge.fury.io/rb/mailboxer) [![](https://gemnasium.com/ging/mailboxer.png)](https://gemnasium.com/ging/mailboxer)
 
+This fork allows usage of multiple `message_attachments` attached to messages.  All messages will have an array of messages attachments and are accessed by `message.message_attachments`.
+
 This project is based on the need for a private message system for [ging
 / social\_stream](https://github.com/ging/social_stream). Instead of creating our core message system heavily
 dependent on our development, we are trying to implement a generic and
