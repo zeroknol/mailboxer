@@ -99,7 +99,7 @@ module Mailboxer
         }).build
 
         if attachment
-          attach(message, attachment)
+          attach(response, attachment)
         end
 
         response.recipients.delete(self)
