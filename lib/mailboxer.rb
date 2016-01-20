@@ -24,6 +24,8 @@ module Mailboxer
   mattr_accessor :notification_mailer
   mattr_accessor :message_mailer
   mattr_accessor :custom_deliver_proc
+  mattr_accessor :attachment_uploader
+  @@attachment_uploader = 'Mailboxer::AttachmentUploader'
 
   class << self
     def setup
