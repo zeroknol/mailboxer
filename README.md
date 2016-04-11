@@ -2,6 +2,8 @@
 
 This fork allows usage of multiple `message_attachments` attached to messages.  All messages will have an array of messages attachments and are accessed by `message.message_attachments`.
 
+When sending messages, the attach parameter expects an array of uploaded files.
+
 This project is based on the need for a private message system for [ging
 / social\_stream](https://github.com/ging/social_stream). Instead of creating our core message system heavily
 dependent on our development, we are trying to implement a generic and
