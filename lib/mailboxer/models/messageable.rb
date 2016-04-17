@@ -130,7 +130,7 @@ module Mailboxer
 
       def attach(message, attachment)
         attachment.each do |m|
-          message.message_attachments << MessageAttachment.new(attachment: m)
+          message.message_attachments << MessageAttachment.new(tag: m[:tag], attachment: m[:attachment])
         end
       end
 
