@@ -2,9 +2,9 @@ class Mailboxer::Receipt < ActiveRecord::Base
   self.table_name = :mailboxer_receipts
   attr_accessible :trashed, :is_read, :deleted if Mailboxer.protected_attributes?
 
-  belongs_to :notification, :class_name => "Mailboxer::Notification", :validate => true, :autosave => true
-  belongs_to :receiver, :polymorphic => :true
-  belongs_to :message, :class_name => "Mailboxer::Message", :foreign_key => "notification_id"
+  belongs_to :notification, :class_name => "Mailboxer::Notification"
+  belongs_to :receiver, :polymorphic => :true, :required => false
+  belongs_to :message, :class_name => "Mailboxer::Message", :foreign_key => "notification_id", :required => false
 
   validates_presence_of :receiver
 
@@ -13,13 +13,13 @@ class Mailboxer::Receipt < ActiveRecord::Base
   }
   #Notifications Scope checks type to be nil, not Notification because of STI behaviour
   #with the primary class (no type is saved)
-  scope :notifications_receipts, lambda { joins(:notification).where('mailboxer_notifications.type' => nil) }
-  scope :messages_receipts, lambda { joins(:notification).where('mailboxer_notifications.type' => Mailboxer::Message.to_s) }
+  scope :notifications_receipts, lambda { joins(:notification).where(:mailboxer_notifications => { :type => nil }) }
+  scope :messages_receipts, lambda { joins(:notification).where(:mailboxer_notifications => { :type => Mailboxer::Message.to_s }) }
   scope :notification, lambda { |notification|
     where(:notification_id => notification.id)
   }
   scope :conversation, lambda { |conversation|
-    joins(:message).where('mailboxer_notifications.conversation_id' => conversation.id)
+    joins(:message).where(:mailboxer_notifications => { :conversation_id => conversation.id })
   }
   scope :sentbox, lambda { where(:mailbox_type => "sentbox") }
   scope :inbox, lambda { where(:mailbox_type => "inbox") }
@@ -30,7 +30,6 @@ class Mailboxer::Receipt < ActiveRecord::Base
   scope :is_read, lambda { where(:is_read => true) }
   scope :is_unread, lambda { where(:is_read => false) }
 
-  after_validation :remove_duplicate_errors
   class << self
     #Marks all the receipts from the relation as read
     def mark_as_read(options={})
@@ -73,12 +72,8 @@ class Mailboxer::Receipt < ActiveRecord::Base
     end
 
     def update_receipts(updates, options={})
-      ids = where(options).map { |rcp| rcp.id }
-      unless ids.empty?
-        sql = ids.map { "#{table_name}.id = ? " }.join(' OR ')
-        conditions = [sql].concat(ids)
-        Mailboxer::Receipt.where(conditions).update_all(updates)
-      end
+      ids = where(options).pluck(:id)
+      Mailboxer::Receipt.where(:id => ids).update_all(updates) unless ids.empty?
     end
   end
 
@@ -139,16 +134,6 @@ class Mailboxer::Receipt < ActiveRecord::Base
   end
 
   protected
-
-  #Removes the duplicate error about not present subject from Conversation if it has been already
-  #raised by Message
-  def remove_duplicate_errors
-    if errors["mailboxer_notification.conversation.subject"].present? and errors["mailboxer_notification.subject"].present?
-      errors["mailboxer_notification.conversation.subject"].each do |msg|
-        errors["mailboxer_notification.conversation.subject"].delete(msg)
-      end
-    end
-  end
 
   if Mailboxer.search_enabled
     searchable do

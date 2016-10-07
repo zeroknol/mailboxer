@@ -308,7 +308,8 @@ describe "Mailboxer::Models::Messageable through User" do
   end
 
   it "should be able to read attachment" do
-    @receipt = @entity1.send_message(@entity2, "Body", "Subject", nil, [File.open('spec/testfile.txt'), File.open('spec/1.mp4')])
+    @receipt = @entity1.send_message(@entity2, "Body", "Subject", nil, [{tag: 'text', attachment: File.open('spec/testfile.txt')}, 
+      { tag: 'video', attachment: File.open('spec/1.mp4')}])
     @conversation = @receipt.conversation
     expect(@conversation.messages.first.message_attachments.first.attachment_identifier).to eq 'testfile.txt'
   end

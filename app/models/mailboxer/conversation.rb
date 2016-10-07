@@ -14,7 +14,7 @@ class Mailboxer::Conversation < ActiveRecord::Base
 
   scope :participant, lambda {|participant|
     where('mailboxer_notifications.type'=> Mailboxer::Message.name).
-    order("mailboxer_conversations.updated_at DESC").
+    order(updated_at: :desc).
     joins(:receipts).merge(Mailboxer::Receipt.recipient(participant)).distinct
   }
   scope :inbox, lambda {|participant|
@@ -31,6 +31,13 @@ class Mailboxer::Conversation < ActiveRecord::Base
   }
   scope :not_trash,  lambda {|participant|
     participant(participant).merge(Mailboxer::Receipt.not_trash)
+  }
+  scope :between, lambda {|participant_one, participant_two|
+    joins("INNER JOIN (#{Mailboxer::Notification.recipient(participant_two).to_sql}) participant_two_notifications " \
+          "ON participant_two_notifications.conversation_id = #{table_name}.id AND participant_two_notifications.type IN ('Mailboxer::Message')").
+        joins("INNER JOIN mailboxer_receipts ON mailboxer_receipts.notification_id = participant_two_notifications.id").
+        merge(Mailboxer::Receipt.recipient(participant_one)).
+        order(updated_at: :desc).distinct
   }
 
   #Mark the conversation as read for one of the participants
@@ -86,7 +93,7 @@ class Mailboxer::Conversation < ActiveRecord::Base
 
   #First message of the conversation.
   def original_message
-    @original_message ||= messages.order('created_at').first
+    @original_message ||= messages.order(:created_at).first
   end
 
   #Sender of the last message.
@@ -96,7 +103,7 @@ class Mailboxer::Conversation < ActiveRecord::Base
 
   #Last message in the conversation.
   def last_message
-    @last_message ||= messages.order('created_at DESC').first
+    @last_message ||= messages.order(:created_at => :desc, :id => :desc).first
   end
 
   #Returns the receipts of the conversation for one participants
@@ -115,17 +122,17 @@ class Mailboxer::Conversation < ActiveRecord::Base
     receipts_for(participant).any?
   end
 
-	#Adds a new participant to the conversation
-	def add_participant(participant)
-		messages.each do |message|
+  #Adds a new participant to the conversation
+  def add_participant(participant)
+    messages.each do |message|
       Mailboxer::ReceiptBuilder.new({
         :notification => message,
         :receiver     => participant,
         :updated_at   => message.updated_at,
         :created_at   => message.created_at
       }).build.save
-		end
-	end
+    end
+  end
 
   #Returns true if the participant has at least one trashed message of the conversation
   def is_trashed?(participant)
@@ -163,7 +170,7 @@ class Mailboxer::Conversation < ActiveRecord::Base
   end
 
   # Creates a opt out object
-  # because by default all particpants are opt in
+  # because by default all participants are opt in
   def opt_out(participant)
     return unless has_subscriber?(participant)
     opt_outs.create(:unsubscriber => participant)

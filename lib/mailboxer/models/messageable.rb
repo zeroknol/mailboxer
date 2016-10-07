@@ -14,12 +14,7 @@ module Mailboxer
 
       included do
         has_many :messages, :class_name => "Mailboxer::Message", :as => :sender
-        if Rails::VERSION::MAJOR >= 4
-          has_many :receipts, -> { order 'created_at DESC' }, :class_name => "Mailboxer::Receipt", dependent: :destroy,     as: :receiver
-        else
-          # Rails 3 does it this way
-          has_many :receipts, :order => 'created_at DESC',    :class_name => "Mailboxer::Receipt", :dependent => :destroy, :as => :receiver
-        end
+        has_many :receipts, -> { order(:created_at => :desc, :id => :desc) }, :class_name => "Mailboxer::Receipt", dependent: :destroy, as: :receiver
       end
 
       unless defined?(Mailboxer.name_method)
@@ -78,7 +73,7 @@ module Mailboxer
           :created_at   => message_timestamp,
           :updated_at   => message_timestamp
         }).build
-         
+
         if attachment
           attach(message, attachment)
         end
@@ -186,11 +181,11 @@ module Mailboxer
       #* An array with any of them
       def mark_as_deleted(obj)
         case obj
-          when Receipt
+          when Mailboxer::Receipt
             return obj.mark_as_deleted if obj.receiver == self
-          when Message, Notification
+          when Mailboxer::Message, Mailboxer::Notification
             obj.mark_as_deleted(self)
-          when Conversation
+          when Mailboxer::Conversation
             obj.mark_as_deleted(self)
           when Array
             obj.map{ |sub_obj| mark_as_deleted(sub_obj) }

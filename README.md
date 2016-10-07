@@ -194,7 +194,7 @@ alfa.send_message(beta, "Body", "subject")
 
 ### How can I read the messages of a conversation?
 
-As a messageable, what you receive are receipts, which are associated with the message itself. You should retrieve your receipts for the conversation a get the message associated with them.
+As a messageable, what you receive are receipts, which are associated with the message itself. You should retrieve your receipts for the conversation and get the message associated with them.
 
 This is done this way because receipts save the information about the relation between messageable and the messages: is it read?, is it trashed?, etc.
 
@@ -214,7 +214,7 @@ receipts.each do |receipt|
 end
 ```
 
-### How can I reply a message?
+### How can I reply to a message?
 
 ```ruby
 #alfa wants to reply to all in a conversation
@@ -267,7 +267,7 @@ alfa.mailbox.trash
 
 ### How can I paginate conversations?
 
-You can use Kaminari to paginate the conversations as normal. Please, make sure you use the last version as mailboxer uses `select('DISTINCT conversations.*')` which was not respected before Kaminari 0.12.4 according to its changelog. Working corretly on Kaminari 0.13.0.
+You can use Kaminari to paginate the conversations as normal. Please, make sure you use the last version as mailboxer uses `select('DISTINCT conversations.*')` which was not respected before Kaminari 0.12.4 according to its changelog. Working correctly on Kaminari 0.13.0.
 
 ```ruby
 #Paginating all conversations using :page parameter and 9 per page
@@ -291,7 +291,7 @@ Thanks to [Roman Kushnir (@RKushnir)](https://github.com/RKushnir/) you can test
 
 ## I need a GUI!
 
-If you need a GUI you should take a look a these links:
+If you need a GUI you should take a look at these links:
 
 * The [rails-messaging](https://github.com/frodefi/rails-messaging) project.
 * The wiki page [GUI Example on a real application](https://github.com/ging/mailboxer/wiki/GUI-Example-on-a-real-application).

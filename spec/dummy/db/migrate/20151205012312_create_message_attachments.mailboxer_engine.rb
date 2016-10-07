@@ -4,6 +4,7 @@ class CreateMessageAttachments < ActiveRecord::Migration
     create_table :mailboxer_message_attachments do |t|
       t.integer :message_id
       t.column :attachment, :string
+      t.string :tag
       t.timestamps
     end
     remove_column :mailboxer_notifications, :attachment
