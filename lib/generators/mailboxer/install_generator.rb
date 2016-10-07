@@ -14,6 +14,7 @@ class Mailboxer::InstallGenerator < Rails::Generators::Base #:nodoc:
 
   def create_initializer_file
     template 'initializer.rb', 'config/initializers/mailboxer.rb'
+    template 'shrine_initializer.rb', 'config/initializers/shrine.rb'
   end
 
   def copy_migrations

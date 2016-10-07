@@ -5,13 +5,14 @@ class Mailboxer::Message < Mailboxer::Notification
   has_many :message_attachments, :class_name => "Mailboxer::MessageAttachment"
   validates_presence_of :sender
 
+  include Mailboxer::AttachmentUploader[:attachment]
+
   class_attribute :on_deliver_callback
   protected :on_deliver_callback
   scope :conversation, lambda { |conversation|
     where(:conversation_id => conversation.id)
   }
 
-  mount_uploader :attachment, Mailboxer::AttachmentUploader
 
   class << self
     #Sets the on deliver callback method.
